@@ -60,7 +60,7 @@ public class UrlShortenerService {
     }
 
     @Transactional
-    public Boolean updateUrl(String shortUrl, String longUrl) {
+    public void updateUrl(String shortUrl, String longUrl) {
         Url target = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
         urlRepository.findByOriginalUrl(longUrl).ifPresent(existing -> {
             if(!existing.getId().equals(target.getId())){
@@ -70,7 +70,6 @@ public class UrlShortenerService {
 
         target.setOriginalUrl(longUrl);
         urlRepository.save(target);
-        return true;
     }
 
     private String generateUniqueCode() {
