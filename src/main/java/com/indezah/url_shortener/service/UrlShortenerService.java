@@ -1,7 +1,10 @@
 package com.indezah.url_shortener.service;
 
 import com.indezah.url_shortener.entity.Url;
+import com.indezah.url_shortener.exception.UrlAlreadyExistsException;
+import com.indezah.url_shortener.exception.UrlNotFoundException;
 import com.indezah.url_shortener.repository.UrlRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,6 +28,7 @@ public class UrlShortenerService {
         this.urlRepository = urlRepository;
     }
 
+    @Transactional
     public String createShortUrl(String longUrl) {
         Optional<Url> existing = urlRepository.findByOriginalUrl(longUrl);
         if (existing.isPresent()) {
@@ -40,7 +44,10 @@ public class UrlShortenerService {
                 urlRepository.save(newUrl);
                 return newUrl.getShortCode();
             } catch (DataIntegrityViolationException e) {
-                // Short code collided with an existing row — safe to ignore and retry
+                Optional<Url> concurrentInsert = urlRepository.findByOriginalUrl(longUrl);
+                if (concurrentInsert.isPresent()) {
+                    return concurrentInsert.get().getShortCode();
+                }
                 log.warn("Short code collision on attempt {}: {}", i, newUrl.getShortCode());
             }
         }
@@ -49,14 +56,20 @@ public class UrlShortenerService {
 
 
     public String getUrl(String shortUrl) {
-        return urlRepository.findByShortCode(shortUrl).map(Url::getOriginalUrl).orElseThrow(() -> new RuntimeException("Short URL not found"));
+        return urlRepository.findByShortCode(shortUrl).map(Url::getOriginalUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
     }
 
+    @Transactional
     public Boolean updateUrl(String shortUrl, String longUrl) {
-        Url result = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new RuntimeException("Short URL not found"));
+        Url target = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
+        urlRepository.findByOriginalUrl(longUrl).ifPresent(existing -> {
+            if(!existing.getId().equals(target.getId())){
+                throw new UrlAlreadyExistsException("URL Already in use");
+            }
+        });
 
-        result.setOriginalUrl(longUrl);
-        urlRepository.save(result);
+        target.setOriginalUrl(longUrl);
+        urlRepository.save(target);
         return true;
     }
 

@@ -8,9 +8,4 @@ import lombok.Setter;
 public class UpdateUrlRequest {
     private String shortUrl;
     private String newOriginalUrl;
-
-    public UpdateUrlRequest(String shortUrl, String newOriginalUrl){
-        this.newOriginalUrl = newOriginalUrl;
-        this.shortUrl = shortUrl;
-    }
 }
