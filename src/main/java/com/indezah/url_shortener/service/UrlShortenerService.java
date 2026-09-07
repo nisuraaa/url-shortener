@@ -69,6 +69,17 @@ public class UrlShortenerService {
         }
     }
 
+    public int getStatistics(String shortUrl) {
+        Optional<Url> url = urlRepository.findByShortCode(shortUrl);
+        if (url.isPresent()) {
+            return url.get().getClicks();
+        } else {
+            throw new UrlNotFoundException(shortUrl);
+        }
+    }
+
+
+
     @Transactional
     public void updateUrl(String shortUrl, String longUrl) {
         Url target = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));

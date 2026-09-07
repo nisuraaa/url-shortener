@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("api/url-shortener")
 public class UrlController {
@@ -23,14 +25,22 @@ public class UrlController {
     }
 
     @GetMapping("/{url}")
-    public ResponseEntity<GetUrlResponse> getUrl(@PathVariable String url) {
+    public ResponseEntity<Void> getUrl(@PathVariable String url) {
         String originalUrl = urlShortenerService.getUrl(url);
-        return ResponseEntity.status(HttpStatus.OK).body(new GetUrlResponse(originalUrl));
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(originalUrl))
+                .build();
     }
 
     @PutMapping
     public ResponseEntity<UpdateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
         urlShortenerService.updateUrl(request.getShortUrl(), request.getNewOriginalUrl());
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(request.getShortUrl(), request.getNewOriginalUrl()));
+    }
+
+    @GetMapping("/{url}/stats")
+    public ResponseEntity<StatsResponse> getStatistics(@PathVariable String url) {
+        int count = urlShortenerService.getStatistics(url);
+        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(count));
     }
 }
