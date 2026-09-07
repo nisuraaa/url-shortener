@@ -42,4 +42,10 @@ public class UrlController {
         Url statistics = urlShortenerService.getStatistics(shortCode);
         return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt()));
     }
+
+    @DeleteMapping("/{shortCode}")
+    public ResponseEntity<Void> deleteUrl(@PathVariable String shortCode) {
+        urlShortenerService.deleteUrl(shortCode);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

@@ -78,8 +78,6 @@ public class UrlShortenerService {
         }
     }
 
-
-
     @Transactional
     public void updateUrl(String shortCode, String originalUrl) {
         Url target = urlRepository.findByShortCode(shortCode).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
@@ -91,6 +89,12 @@ public class UrlShortenerService {
 
         target.setOriginalUrl(originalUrl);
         urlRepository.save(target);
+    }
+
+    @Transactional
+    public void deleteUrl(String shortCode) {
+        Url target = urlRepository.findByShortCode(shortCode).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
+        urlRepository.delete(target);
     }
 
     private String generateUniqueCode() {
