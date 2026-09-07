@@ -2,6 +2,7 @@ package com.indezah.url_shortener.controller;
 
 import com.indezah.url_shortener.dto.*;
 import com.indezah.url_shortener.service.UrlShortenerService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +17,7 @@ public class UrlController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateUrlResponse> createUrl(@RequestBody CreateUrlRequest request) {
-        if (request.getOriginalUrl() == null || request.getOriginalUrl().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<CreateUrlResponse> createUrl(@Valid @RequestBody CreateUrlRequest request) {
         String shortUrl = urlShortenerService.createShortUrl(request.getOriginalUrl());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUrlResponse(shortUrl, request.getOriginalUrl()));
     }
@@ -31,7 +29,7 @@ public class UrlController {
     }
 
     @PutMapping
-    public ResponseEntity<CreateUrlResponse> updateUrl(@RequestBody UpdateUrlRequest request) {
+    public ResponseEntity<CreateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
         urlShortenerService.updateUrl(request.getShortUrl(), request.getNewOriginalUrl());
         return ResponseEntity.status(HttpStatus.OK).body(new CreateUrlResponse(request.getShortUrl(), request.getNewOriginalUrl()));
     }
