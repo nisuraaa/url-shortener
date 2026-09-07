@@ -26,7 +26,7 @@ public class UrlController {
     @GetMapping("/{shortCode}")
     public ResponseEntity<UrlResponse> getUrl(@PathVariable String shortCode) {
         Url url = urlShortenerService.getUrl(shortCode);
-        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(url.getId(), url.getShortCode(), url.getOriginalUrl(), url.getCreatedAt()));
+        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(url.getId(), url.getShortCode(), url.getOriginalUrl(), url.getCreatedAt(), url.getClicks()));
     }
 
     @PutMapping("/{shortCode}")
@@ -38,7 +38,7 @@ public class UrlController {
     @GetMapping("/{shortCode}/stats")
     public ResponseEntity<UrlResponse> getStatistics(@PathVariable String shortCode) {
         Url statistics = urlShortenerService.getStatistics(shortCode);
-        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt()));
+        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt(), statistics.getClicks()));
     }
 
     @DeleteMapping("/{shortCode}")
