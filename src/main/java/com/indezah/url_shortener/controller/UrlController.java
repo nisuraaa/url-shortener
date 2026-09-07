@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-
 @RestController
 @RequestMapping("api/url-shortener")
 public class UrlController {
@@ -26,9 +24,9 @@ public class UrlController {
     }
 
     @GetMapping("/{shortCode}")
-    public ResponseEntity<Void> getUrl(@PathVariable String shortCode) {
-        String originalUrl = urlShortenerService.getUrl(shortCode);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl)).build();
+    public ResponseEntity<UrlResponse> getUrl(@PathVariable String shortCode) {
+        Url url = urlShortenerService.getUrl(shortCode);
+        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(url.getId(), url.getShortCode(), url.getOriginalUrl(), url.getCreatedAt()));
     }
 
     @PutMapping("/{shortCode}")
@@ -38,9 +36,9 @@ public class UrlController {
     }
 
     @GetMapping("/{shortCode}/stats")
-    public ResponseEntity<StatsResponse> getStatistics(@PathVariable String shortCode) {
+    public ResponseEntity<UrlResponse> getStatistics(@PathVariable String shortCode) {
         Url statistics = urlShortenerService.getStatistics(shortCode);
-        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt()));
+        return ResponseEntity.status(HttpStatus.OK).body(new UrlResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt()));
     }
 
     @DeleteMapping("/{shortCode}")

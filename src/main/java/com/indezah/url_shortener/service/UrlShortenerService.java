@@ -59,11 +59,11 @@ public class UrlShortenerService {
 
 
     @Transactional
-    public String getUrl(String shortCode) {
+    public Url getUrl(String shortCode) {
         Optional<Url> url = urlRepository.findByShortCode(shortCode);
         if (url.isPresent()) {
             clickService.recordClick(shortCode);
-            return url.get().getOriginalUrl();
+            return url.get();
         } else {
             throw new UrlNotFoundException(shortCode);
         }
@@ -105,10 +105,5 @@ public class UrlShortenerService {
         }
 
         return reqString.toString();
-    }
-
-    @Async
-    public void recordClick(String shortCode) {
-        urlRepository.incrementClicks(shortCode);
     }
 }
