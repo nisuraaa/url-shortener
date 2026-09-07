@@ -31,10 +31,10 @@ public class UrlController {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl)).build();
     }
 
-    @PutMapping
-    public ResponseEntity<UpdateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
-        urlShortenerService.updateUrl(request.getShortCode(), request.getOriginalUrl());
-        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(request.getShortCode(), request.getOriginalUrl()));
+    @PutMapping("/{shortCode}")
+    public ResponseEntity<UpdateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request, @PathVariable String shortCode) {
+        urlShortenerService.updateUrl(shortCode, request.getOriginalUrl());
+        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(shortCode, request.getOriginalUrl()));
     }
 
     @GetMapping("/{shortCode}/stats")
