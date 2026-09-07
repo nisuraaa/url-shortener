@@ -29,8 +29,8 @@ public class UrlController {
     }
 
     @PutMapping
-    public ResponseEntity<CreateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
+    public ResponseEntity<UpdateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
         urlShortenerService.updateUrl(request.getShortUrl(), request.getNewOriginalUrl());
-        return ResponseEntity.status(HttpStatus.OK).body(new CreateUrlResponse(request.getShortUrl(), request.getNewOriginalUrl()));
+        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(request.getShortUrl(), request.getNewOriginalUrl()));
     }
 }
