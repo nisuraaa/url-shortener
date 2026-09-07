@@ -1,6 +1,7 @@
 package com.indezah.url_shortener.controller;
 
 import com.indezah.url_shortener.dto.*;
+import com.indezah.url_shortener.entity.Url;
 import com.indezah.url_shortener.service.UrlShortenerService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,7 @@ public class UrlController {
     @GetMapping("/{url}")
     public ResponseEntity<Void> getUrl(@PathVariable String url) {
         String originalUrl = urlShortenerService.getUrl(url);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(originalUrl))
-                .build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl)).build();
     }
 
     @PutMapping
@@ -40,7 +39,7 @@ public class UrlController {
 
     @GetMapping("/{url}/stats")
     public ResponseEntity<StatsResponse> getStatistics(@PathVariable String url) {
-        int count = urlShortenerService.getStatistics(url);
-        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(count));
+        Url statistics = urlShortenerService.getStatistics(url);
+        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedDate()));
     }
 }

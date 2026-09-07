@@ -69,10 +69,10 @@ public class UrlShortenerService {
         }
     }
 
-    public int getStatistics(String shortUrl) {
+    public Url getStatistics(String shortUrl) {
         Optional<Url> url = urlRepository.findByShortCode(shortUrl);
         if (url.isPresent()) {
-            return url.get().getClicks();
+            return url.get() ;
         } else {
             throw new UrlNotFoundException(shortUrl);
         }
