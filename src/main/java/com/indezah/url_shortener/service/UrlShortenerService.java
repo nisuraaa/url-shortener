@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -18,14 +19,16 @@ import java.util.Random;
 public class UrlShortenerService {
 
     private final UrlRepository urlRepository;
+    private final ClickService clickService;
     private static final Logger log = LoggerFactory.getLogger(UrlShortenerService.class);
     private final String alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private final int requiredLength = 8;
     private final int MAX_ATTEMPTS = 10;
     private final Random random = new SecureRandom();
 
-    public UrlShortenerService(UrlRepository urlRepository) {
+    public UrlShortenerService(UrlRepository urlRepository, ClickService clickService) {
         this.urlRepository = urlRepository;
+        this.clickService = clickService;
     }
 
     @Transactional
@@ -55,15 +58,22 @@ public class UrlShortenerService {
     }
 
 
+    @Transactional
     public String getUrl(String shortUrl) {
-        return urlRepository.findByShortCode(shortUrl).map(Url::getOriginalUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
+        Optional<Url> url = urlRepository.findByShortCode(shortUrl);
+        if (url.isPresent()) {
+            clickService.recordClick(shortUrl);
+            return url.get().getOriginalUrl();
+        } else {
+            throw new UrlNotFoundException(shortUrl);
+        }
     }
 
     @Transactional
     public void updateUrl(String shortUrl, String longUrl) {
         Url target = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
         urlRepository.findByOriginalUrl(longUrl).ifPresent(existing -> {
-            if(!existing.getId().equals(target.getId())){
+            if (!existing.getId().equals(target.getId())) {
                 throw new UrlAlreadyExistsException("URL Already in use");
             }
         });
@@ -80,5 +90,10 @@ public class UrlShortenerService {
         }
 
         return reqString.toString();
+    }
+
+    @Async
+    public void recordClick(String code) {
+        urlRepository.incrementClicks(code);
     }
 }

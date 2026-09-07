@@ -25,6 +25,9 @@ class UrlShortenerServiceTest {
     @Mock
     private UrlRepository urlRepository;
 
+    @Mock
+    private ClickService clickService;
+
     @InjectMocks
     private UrlShortenerService urlShortenerService;
 
@@ -44,6 +47,7 @@ class UrlShortenerServiceTest {
         when(urlRepository.findByShortCode("abc")).thenReturn(Optional.of(url));
 
         assertEquals("www.google.lk", urlShortenerService.getUrl("abc"));
+        verify(clickService).recordClick("abc");
     }
 
     @Test

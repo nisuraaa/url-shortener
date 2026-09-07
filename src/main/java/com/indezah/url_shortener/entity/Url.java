@@ -24,6 +24,9 @@ public class Url {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
+    @Column(nullable = false, name = "clicks")
+    private Integer clicks = 0;
+
     @PrePersist
     protected void onCreate() {
         this.createdDate = LocalDateTime.now();
