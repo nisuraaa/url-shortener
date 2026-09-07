@@ -27,8 +27,3 @@ replay_pid*
 /.gradle
 /.idea
 /out
-/build
-/build
-/build
-build/resources/main/application.properties
-build/tmp/compileJava/compileTransaction/stash-dir/GlobalExceptionHandler.class.uniqueId0
