@@ -14,6 +14,6 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
     Optional<Url> findByOriginalUrl(String originalUrl);
 
     @Modifying
-    @Query("UPDATE Url u SET u.clicks = u.clicks + 1 WHERE u.shortCode = :code")
-    void incrementClicks(String code);
+    @Query("UPDATE Url u SET u.clicks = u.clicks + 1 WHERE u.shortCode = :shortCode")
+    void incrementClicks(String shortCode);
 }

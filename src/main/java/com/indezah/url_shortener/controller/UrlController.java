@@ -21,25 +21,25 @@ public class UrlController {
 
     @PostMapping
     public ResponseEntity<CreateUrlResponse> createUrl(@Valid @RequestBody CreateUrlRequest request) {
-        String shortUrl = urlShortenerService.createShortUrl(request.getOriginalUrl());
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUrlResponse(shortUrl, request.getOriginalUrl()));
+        String shortCode = urlShortenerService.createShortUrl(request.getOriginalUrl());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateUrlResponse(shortCode, request.getOriginalUrl()));
     }
 
-    @GetMapping("/{url}")
-    public ResponseEntity<Void> getUrl(@PathVariable String url) {
-        String originalUrl = urlShortenerService.getUrl(url);
+    @GetMapping("/{shortCode}")
+    public ResponseEntity<Void> getUrl(@PathVariable String shortCode) {
+        String originalUrl = urlShortenerService.getUrl(shortCode);
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(originalUrl)).build();
     }
 
     @PutMapping
     public ResponseEntity<UpdateUrlResponse> updateUrl(@Valid @RequestBody UpdateUrlRequest request) {
-        urlShortenerService.updateUrl(request.getShortUrl(), request.getNewOriginalUrl());
-        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(request.getShortUrl(), request.getNewOriginalUrl()));
+        urlShortenerService.updateUrl(request.getShortCode(), request.getOriginalUrl());
+        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUrlResponse(request.getShortCode(), request.getOriginalUrl()));
     }
 
-    @GetMapping("/{url}/stats")
-    public ResponseEntity<StatsResponse> getStatistics(@PathVariable String url) {
-        Url statistics = urlShortenerService.getStatistics(url);
-        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedDate()));
+    @GetMapping("/{shortCode}/stats")
+    public ResponseEntity<StatsResponse> getStatistics(@PathVariable String shortCode) {
+        Url statistics = urlShortenerService.getStatistics(shortCode);
+        return ResponseEntity.status(HttpStatus.OK).body(new StatsResponse(statistics.getId(), statistics.getShortCode(), statistics.getOriginalUrl(), statistics.getCreatedAt()));
     }
 }

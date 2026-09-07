@@ -15,8 +15,8 @@ public class ClickService {
 
     @Async
     @Transactional
-    public void recordClick(String code) {
-        urlRepository.incrementClicks(code);
+    public void recordClick(String shortCode) {
+        urlRepository.incrementClicks(shortCode);
     }
 
 }

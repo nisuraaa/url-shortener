@@ -6,11 +6,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateUrlResponse {
-    private String shortUrl;
+    private String shortCode;
     private String originalUrl;
 
-    public CreateUrlResponse(String shortUrl, String originalUrl){
+    public CreateUrlResponse(String shortCode, String originalUrl){
         this.originalUrl = originalUrl;
-        this.shortUrl = shortUrl;
+        this.shortCode = shortCode;
     }
 }

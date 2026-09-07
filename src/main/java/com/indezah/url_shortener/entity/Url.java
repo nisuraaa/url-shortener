@@ -22,13 +22,13 @@ public class Url {
     private String originalUrl;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
 
     @Column(nullable = false, name = "clicks")
     private Integer clicks = 0;
 
     @PrePersist
     protected void onCreate() {
-        this.createdDate = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

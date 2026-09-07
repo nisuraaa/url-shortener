@@ -32,22 +32,22 @@ public class UrlShortenerService {
     }
 
     @Transactional
-    public String createShortUrl(String longUrl) {
-        Optional<Url> existing = urlRepository.findByOriginalUrl(longUrl);
+    public String createShortUrl(String originalUrl) {
+        Optional<Url> existing = urlRepository.findByOriginalUrl(originalUrl);
         if (existing.isPresent()) {
             Url existingUrl = existing.get();
             return existingUrl.getShortCode();
         }
         for (int i = 0; i < MAX_ATTEMPTS; i++) {
             Url newUrl = new Url();
-            newUrl.setOriginalUrl(longUrl);
+            newUrl.setOriginalUrl(originalUrl);
             newUrl.setShortCode(generateUniqueCode());
 
             try {
                 urlRepository.save(newUrl);
                 return newUrl.getShortCode();
             } catch (DataIntegrityViolationException e) {
-                Optional<Url> concurrentInsert = urlRepository.findByOriginalUrl(longUrl);
+                Optional<Url> concurrentInsert = urlRepository.findByOriginalUrl(originalUrl);
                 if (concurrentInsert.isPresent()) {
                     return concurrentInsert.get().getShortCode();
                 }
@@ -59,37 +59,37 @@ public class UrlShortenerService {
 
 
     @Transactional
-    public String getUrl(String shortUrl) {
-        Optional<Url> url = urlRepository.findByShortCode(shortUrl);
+    public String getUrl(String shortCode) {
+        Optional<Url> url = urlRepository.findByShortCode(shortCode);
         if (url.isPresent()) {
-            clickService.recordClick(shortUrl);
+            clickService.recordClick(shortCode);
             return url.get().getOriginalUrl();
         } else {
-            throw new UrlNotFoundException(shortUrl);
+            throw new UrlNotFoundException(shortCode);
         }
     }
 
-    public Url getStatistics(String shortUrl) {
-        Optional<Url> url = urlRepository.findByShortCode(shortUrl);
+    public Url getStatistics(String shortCode) {
+        Optional<Url> url = urlRepository.findByShortCode(shortCode);
         if (url.isPresent()) {
             return url.get() ;
         } else {
-            throw new UrlNotFoundException(shortUrl);
+            throw new UrlNotFoundException(shortCode);
         }
     }
 
 
 
     @Transactional
-    public void updateUrl(String shortUrl, String longUrl) {
-        Url target = urlRepository.findByShortCode(shortUrl).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
-        urlRepository.findByOriginalUrl(longUrl).ifPresent(existing -> {
+    public void updateUrl(String shortCode, String originalUrl) {
+        Url target = urlRepository.findByShortCode(shortCode).orElseThrow(() -> new UrlNotFoundException("Short URL not found"));
+        urlRepository.findByOriginalUrl(originalUrl).ifPresent(existing -> {
             if (!existing.getId().equals(target.getId())) {
                 throw new UrlAlreadyExistsException("URL Already in use");
             }
         });
 
-        target.setOriginalUrl(longUrl);
+        target.setOriginalUrl(originalUrl);
         urlRepository.save(target);
     }
 
@@ -104,7 +104,7 @@ public class UrlShortenerService {
     }
 
     @Async
-    public void recordClick(String code) {
-        urlRepository.incrementClicks(code);
+    public void recordClick(String shortCode) {
+        urlRepository.incrementClicks(shortCode);
     }
 }

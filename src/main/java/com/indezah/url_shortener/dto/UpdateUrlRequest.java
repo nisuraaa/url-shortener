@@ -10,9 +10,9 @@ import org.hibernate.validator.constraints.URL;
 @Setter
 public class UpdateUrlRequest {
     @NotBlank(message = "Code must not be empty")
-    private String shortUrl;
+    private String shortCode;
     @NotBlank(message = "URL must not be empty")
     @URL(message = "originalUrl must be a valid URL")
     @Pattern(regexp = "^https?://.*", message = "URL must start with http:// or https://")
-    private String newOriginalUrl;
+    private String originalUrl;
 }

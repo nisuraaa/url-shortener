@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class StatsResponse {
     private Long id;
-    private String shortUrl;
-    private String url;
+    private String shortCode;
+    private String originalUrl;
     private LocalDateTime createdAt;
 
 }
